@@ -128,7 +128,7 @@ export default function App() {
     setIsGenerating(true);
     setError(null);
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/generate`, {
+      const response = await fetch('https://tcs-nqt-smart-practice-platform.onrender.com/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -166,7 +166,7 @@ export default function App() {
 
   const fetchNextQuestionInBackground = async (subject: string, topic: string, difficulty: string) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/generate`, {
+      const response = await fetch('https://tcs-nqt-smart-practice-platform.onrender.com/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ subject, topics: [topic], difficulty, count: 1, provider: session.provider })
@@ -195,7 +195,7 @@ export default function App() {
       // If we reached the end but didn't pre-fetch (e.g. background fetch failed)
       setIsGenerating(true);
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/generate`, {
+        const response = await fetch('https://tcs-nqt-smart-practice-platform.onrender.com/api/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
