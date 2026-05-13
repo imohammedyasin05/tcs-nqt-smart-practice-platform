@@ -124,6 +124,27 @@ export default function App() {
     return () => clearInterval(interval);
   }, [view, session.timerEnabled, session.status, session.timeRemaining]);
 
+  const normalizeQuestions = (questions: any[]) => {
+    return questions.map((q: any) => ({
+      ...q,
+      question:
+        q.question ||
+        q.question_text ||
+        q.questionText ||
+        q.text ||
+        q.title ||
+        "Question not available",
+      options: q.options || [],
+      answer:
+        typeof q.answer === "number"
+          ? q.answer
+          : Array.isArray(q.options)
+          ? q.options.findIndex((opt: string) => opt === q.answer)
+          : q.answer,
+      explanation: q.explanation || "No explanation provided"
+    }));
+  };
+
   const startSession = async (batchCount: number = 0) => {
     setIsGenerating(true);
     setError(null);
@@ -142,7 +163,7 @@ export default function App() {
 
       if (!response.ok) throw new Error('Generation failed');
       const data = await response.json();
-      const questions = data.questions;
+      const questions = normalizeQuestions(data.questions);
       
       setSession(prev => ({
         ...prev,
@@ -173,9 +194,10 @@ export default function App() {
       });
       if (response.ok) {
         const data = await response.json();
+        const normalized = normalizeQuestions(data.questions);
         setSession(prev => ({
           ...prev,
-          questions: [...prev.questions, data.questions[0]]
+          questions: [...prev.questions, normalized[0]]
         }));
       }
     } catch (err) {
@@ -208,9 +230,10 @@ export default function App() {
         });
         if (!response.ok) throw new Error('Generation failed');
         const data = await response.json();
+        const normalized = normalizeQuestions(data.questions);
         setSession(prev => ({
           ...prev,
-          questions: [...prev.questions, data.questions[0]]
+          questions: [...prev.questions, normalized[0]]
         }));
         setCurrentQIndex(prev => prev + 1);
       } catch (err) {
@@ -540,9 +563,11 @@ export default function App() {
 
               <div className="space-y-8 lg:space-y-10">
                 {console.log("Full question object:", q)}
-                <h2 className="question text-lg lg:text-xl leading-relaxed text-slate-100 font-medium">
-                  {q.question || "Question not loaded"}
-                </h2>
+                {q && (
+                  <h2 className="question text-lg lg:text-xl font-semibold text-white">
+                    {q.question || "Loading question..."}
+                  </h2>
+                )}
 
                 {isCoding && (
                   <div className="space-y-6 lg:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
