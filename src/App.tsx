@@ -228,6 +228,18 @@ export default function App() {
     }));
   };
 
+  const isAnswerCorrect = (q: AptitudeQuestion, userAnswer: string | undefined) => {
+    if (!userAnswer) return false;
+    const ansKey = userAnswer.trim().toUpperCase();
+    const correctAns = (q.correctAnswer || '').trim().toUpperCase();
+    const optionValue = (q.options[ansKey as keyof typeof q.options] || '').trim().toUpperCase();
+    
+    // Debug logging
+    console.log("User Key:", ansKey, "| User Value:", optionValue, "| Correct:", correctAns);
+    
+    return ansKey === correctAns || optionValue === correctAns;
+  };
+
   const finishExam = () => {
     console.log("[DEBUG] finishExam called. Initializing wrap-up sequence.");
 
@@ -252,7 +264,7 @@ export default function App() {
     setSession(prev => {
       // Calculate final stats on the fly to fulfill "calculate score" requirement
       const aptitudeQs = prev.questions.filter(q => q.subject !== 'Coding') as AptitudeQuestion[];
-      const correct = aptitudeQs.reduce((acc, q) => acc + (prev.answers[q.id] === q.correctAnswer ? 1 : 0), 0);
+      const correct = aptitudeQs.reduce((acc, q) => acc + (isAnswerCorrect(q, prev.answers[q.id]) ? 1 : 0), 0);
       const finalScore = aptitudeQs.length > 0 ? Math.round((correct / aptitudeQs.length) * 100) : 100;
       
       console.log(`[DEBUG] Final Calculations -> Correct: ${correct}, Score: ${finalScore}%`);
@@ -618,8 +630,8 @@ export default function App() {
                   className="p-6 lg:p-8 bg-slate-900/40 border border-dashed border-slate-700 rounded-2xl lg:rounded-3xl mt-8 lg:mt-12 mb-10"
                 >
                   <div className="flex items-center gap-4 mb-4 lg:mb-6">
-                     <div className={`px-2 lg:px-3 py-1 rounded inline-block text-[8px] lg:text-[10px] font-bold uppercase tracking-widest ${session.answers[q.id] === aptitudeQ.correctAnswer ? 'bg-emerald-500/20 text-emerald-500' : 'bg-red-500/20 text-red-500'}`}>
-                       {session.answers[q.id] === aptitudeQ.correctAnswer ? 'Correct' : 'Incorrect'}
+                     <div className={`px-2 lg:px-3 py-1 rounded inline-block text-[8px] lg:text-[10px] font-bold uppercase tracking-widest ${isAnswerCorrect(aptitudeQ, session.answers[q.id]) ? 'bg-emerald-500/20 text-emerald-500' : 'bg-red-500/20 text-red-500'}`}>
+                       {isAnswerCorrect(aptitudeQ, session.answers[q.id]) ? 'Correct' : 'Incorrect'}
                      </div>
                      <div className="h-px flex-1 bg-slate-800" />
                      <h4 className="text-slate-500 font-mono text-[9px] lg:text-[10px] uppercase tracking-widest px-2 hidden xs:block">Solution Analysis</h4>
@@ -707,7 +719,7 @@ export default function App() {
     const codingQs = session.questions.filter(q => q.subject === 'Coding') as CodingQuestion[];
     
     const correctCount = aptitudeQs.reduce((acc, q) => {
-      return acc + (session.answers[q.id] === q.correctAnswer ? 1 : 0);
+      return acc + (isAnswerCorrect(q, session.answers[q.id]) ? 1 : 0);
     }, 0);
     
     const codingAttemptedCount = codingQs.reduce((acc, q) => {
