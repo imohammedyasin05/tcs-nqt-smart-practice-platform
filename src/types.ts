@@ -15,13 +15,8 @@ export interface Question {
 }
 
 export interface AptitudeQuestion extends Question {
-  options: {
-    A: string;
-    B: string;
-    C: string;
-    D: string;
-  };
-  correctAnswer: 'A' | 'B' | 'C' | 'D';
+  options: string[];
+  answer: number;
   explanation: string;
 }
 
@@ -42,7 +37,7 @@ export interface ExamSession {
   calculatorEnabled: boolean;
   timeRemaining: number; // in seconds
   questions: (AptitudeQuestion | CodingQuestion)[];
-  answers: Record<string, string>;
+  answers: Record<string, any>;
   status: 'IDLE' | 'STARTED' | 'COMPLETED';
   provider: 'auto' | 'gemini' | 'groq';
 }

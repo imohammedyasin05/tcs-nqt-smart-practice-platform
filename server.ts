@@ -14,19 +14,13 @@ const APTITUDE_SCHEMA = {
   properties: {
     questionText: { type: Type.STRING },
     options: {
-      type: Type.OBJECT,
-      properties: {
-        A: { type: Type.STRING },
-        B: { type: Type.STRING },
-        C: { type: Type.STRING },
-        D: { type: Type.STRING },
-      },
-      required: ["A", "B", "C", "D"],
+      type: Type.ARRAY,
+      items: { type: Type.STRING },
     },
-    correctAnswer: { type: Type.STRING, enum: ["A", "B", "C", "D"] },
+    answer: { type: Type.INTEGER },
     explanation: { type: Type.STRING },
   },
-  required: ["questionText", "options", "correctAnswer", "explanation"],
+  required: ["questionText", "options", "answer", "explanation"],
 };
 
 const CODING_SCHEMA = {
@@ -79,7 +73,7 @@ async function startServer() {
         const topic = topics[0];
         prompt = isCoding
           ? `Generate a TCS NQT level Coding problem on ${topic}, ${difficulty} difficulty. Include a descriptive title, problem statement, sample input/output, constraints, and an explanation. Make it unique.`
-          : `Generate a TCS NQT level ${subject} question on ${topic}, ${difficulty} difficulty, with 4 options (A, B, C, D) and a correct answer. Provide a short explanation. Make it unique.`;
+          : `Generate a TCS NQT level ${subject} question on ${topic}, ${difficulty} difficulty. Provide exactly 4 options in an array. Provide the correct answer as a zero-based integer index (0, 1, 2, or 3). Provide a short explanation. Make it unique.`;
       } else {
         schema = isCoding ? CODING_BATCH_SCHEMA : APTITUDE_BATCH_SCHEMA;
         prompt = `Act as a TCS NQT exam paper generator. 

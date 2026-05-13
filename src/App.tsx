@@ -221,23 +221,11 @@ export default function App() {
     }
   };
 
-  const submitAnswer = (ans: string) => {
+  const submitAnswer = (ans: any) => {
     setSession(prev => ({
       ...prev,
       answers: { ...prev.answers, [session.questions[currentQIndex].id]: ans }
     }));
-  };
-
-  const isAnswerCorrect = (q: AptitudeQuestion, userAnswer: string | undefined) => {
-    if (!userAnswer) return false;
-    const ansKey = userAnswer.trim().toUpperCase();
-    const correctAns = (q.correctAnswer || '').trim().toUpperCase();
-    const optionValue = (q.options[ansKey as keyof typeof q.options] || '').trim().toUpperCase();
-    
-    // Debug logging
-    console.log("User Key:", ansKey, "| User Value:", optionValue, "| Correct:", correctAns);
-    
-    return ansKey === correctAns || optionValue === correctAns;
   };
 
   const finishExam = () => {
@@ -264,7 +252,11 @@ export default function App() {
     setSession(prev => {
       // Calculate final stats on the fly to fulfill "calculate score" requirement
       const aptitudeQs = prev.questions.filter(q => q.subject !== 'Coding') as AptitudeQuestion[];
-      const correct = aptitudeQs.reduce((acc, q) => acc + (isAnswerCorrect(q, prev.answers[q.id]) ? 1 : 0), 0);
+      const correct = aptitudeQs.reduce((acc, q) => {
+        console.log("Selected:", prev.answers[q.id]);
+        console.log("Correct:", q.answer);
+        return acc + (prev.answers[q.id] === q.answer ? 1 : 0);
+      }, 0);
       const finalScore = aptitudeQs.length > 0 ? Math.round((correct / aptitudeQs.length) * 100) : 100;
       
       console.log(`[DEBUG] Final Calculations -> Correct: ${correct}, Score: ${finalScore}%`);
@@ -597,25 +589,25 @@ export default function App() {
 
                 {!isCoding && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 lg:gap-4">
-                    {Object.entries(aptitudeQ.options).map(([key, value]) => (
+                    {aptitudeQ.options.map((optionValue, index) => (
                       <button
-                        key={key}
-                        onClick={() => submitAnswer(key)}
+                        key={index}
+                        onClick={() => submitAnswer(index)}
                         className={`group flex items-center p-4 lg:p-5 rounded-xl border transition-all duration-200 active:scale-[0.98] ${
-                          session.answers[q.id] === key
+                          session.answers[q.id] === index
                             ? 'bg-indigo-600 border-indigo-500 shadow-lg shadow-indigo-500/10'
                             : 'bg-brand-surface border-slate-800 text-slate-400 hover:border-slate-700'
                         }`}
                       >
                         <div className={`w-8 h-8 lg:w-9 lg:h-9 rounded flex items-center justify-center text-xs font-bold mr-4 lg:mr-5 transition-all outline-none ${
-                          session.answers[q.id] === key
+                          session.answers[q.id] === index
                             ? 'bg-white text-indigo-600'
                             : 'bg-slate-800 text-slate-500 group-hover:bg-slate-700 border border-slate-700'
                         }`}>
-                          {key}
+                          {String.fromCharCode(65 + index)}
                         </div>
-                        <span className={`text-sm lg:text-[15px] font-medium transition-colors ${session.answers[q.id] === key ? 'text-white' : 'group-hover:text-slate-200 text-left'}`}>
-                          {value}
+                        <span className={`text-sm lg:text-[15px] font-medium transition-colors ${session.answers[q.id] === index ? 'text-white' : 'group-hover:text-slate-200 text-left'}`}>
+                          {optionValue}
                         </span>
                       </button>
                     ))}
@@ -623,15 +615,15 @@ export default function App() {
                 )}
               </div>
 
-              {!session.examMode && session.answers[q.id] && !isCoding && (
+              {session.answers[q.id] !== undefined && !isCoding && !session.examMode && (
                 <motion.div 
                   initial={{ opacity: 0, y: 10 }} 
                   animate={{ opacity: 1, y: 0 }}
                   className="p-6 lg:p-8 bg-slate-900/40 border border-dashed border-slate-700 rounded-2xl lg:rounded-3xl mt-8 lg:mt-12 mb-10"
                 >
                   <div className="flex items-center gap-4 mb-4 lg:mb-6">
-                     <div className={`px-2 lg:px-3 py-1 rounded inline-block text-[8px] lg:text-[10px] font-bold uppercase tracking-widest ${isAnswerCorrect(aptitudeQ, session.answers[q.id]) ? 'bg-emerald-500/20 text-emerald-500' : 'bg-red-500/20 text-red-500'}`}>
-                       {isAnswerCorrect(aptitudeQ, session.answers[q.id]) ? 'Correct' : 'Incorrect'}
+                     <div className={`px-2 lg:px-3 py-1 rounded inline-block text-[8px] lg:text-[10px] font-bold uppercase tracking-widest ${session.answers[q.id] === aptitudeQ.answer ? 'bg-emerald-500/20 text-emerald-500' : 'bg-red-500/20 text-red-500'}`}>
+                       {session.answers[q.id] === aptitudeQ.answer ? 'Correct' : 'Incorrect'}
                      </div>
                      <div className="h-px flex-1 bg-slate-800" />
                      <h4 className="text-slate-500 font-mono text-[9px] lg:text-[10px] uppercase tracking-widest px-2 hidden xs:block">Solution Analysis</h4>
@@ -719,7 +711,9 @@ export default function App() {
     const codingQs = session.questions.filter(q => q.subject === 'Coding') as CodingQuestion[];
     
     const correctCount = aptitudeQs.reduce((acc, q) => {
-      return acc + (isAnswerCorrect(q, session.answers[q.id]) ? 1 : 0);
+      console.log("Selected:", session.answers[q.id]);
+      console.log("Correct:", q.answer);
+      return acc + (session.answers[q.id] === q.answer ? 1 : 0);
     }, 0);
     
     const codingAttemptedCount = codingQs.reduce((acc, q) => {
