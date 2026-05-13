@@ -125,24 +125,44 @@ export default function App() {
   }, [view, session.timerEnabled, session.status, session.timeRemaining]);
 
   const normalizeQuestions = (questions: any[]) => {
-    return questions.map((q: any) => ({
-      ...q,
-      question:
-        q.question ||
-        q.question_text ||
-        q.questionText ||
-        q.text ||
-        q.title ||
-        "Question not available",
-      options: q.options || [],
-      answer:
-        typeof q.answer === "number"
-          ? q.answer
-          : Array.isArray(q.options)
-          ? q.options.findIndex((opt: string) => opt === q.answer)
-          : q.answer,
-      explanation: q.explanation || "No explanation provided"
-    }));
+    return questions.map((q: any) => {
+      let optionsArray: string[] = [];
+      if (Array.isArray(q.options)) {
+        optionsArray = q.options;
+      } else if (typeof q.options === 'object' && q.options !== null) {
+        optionsArray = Object.values(q.options);
+      }
+      
+      let answerIndex = 0;
+      if (typeof q.answer === 'number') {
+        answerIndex = q.answer;
+      } else if (typeof q.correctAnswer === 'number') {
+        answerIndex = q.correctAnswer;
+      } else if (typeof q.answer === 'string') {
+        const str = q.answer.trim().toUpperCase();
+        if (['A', 'B', 'C', 'D'].includes(str)) {
+          answerIndex = str.charCodeAt(0) - 65;
+        } else {
+          answerIndex = optionsArray.findIndex(opt => String(opt).trim().toUpperCase() === str);
+        }
+      } else if (typeof q.correctAnswer === 'string') {
+        const str = q.correctAnswer.trim().toUpperCase();
+        if (['A', 'B', 'C', 'D'].includes(str)) {
+          answerIndex = str.charCodeAt(0) - 65;
+        } else {
+          answerIndex = optionsArray.findIndex(opt => String(opt).trim().toUpperCase() === str);
+        }
+      }
+      if (answerIndex === -1) answerIndex = 0; // Fallback
+
+      return {
+        ...q,
+        question: q.question || q.question_text || q.questionText || q.text || q.title || "Question not available",
+        options: optionsArray,
+        answer: answerIndex,
+        explanation: q.explanation || "No explanation provided"
+      };
+    });
   };
 
   const startSession = async (batchCount: number = 0) => {
