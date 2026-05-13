@@ -435,9 +435,9 @@ export default function App() {
         {/* Compact Responsive Header */}
         <header className="h-14 lg:h-16 border-b border-slate-700 bg-brand-surface flex items-center justify-between px-4 lg:px-8 shrink-0 sticky top-0 z-30 shadow-md">
           <div className="flex items-center gap-3 lg:gap-6">
-            <div className="flex items-center gap-2 lg:gap-4">
-              <div className="w-8 h-8 lg:w-10 lg:h-10 bg-indigo-600 rounded flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/20 text-xs lg:text-base">TCS</div>
-              <h1 className="text-xs lg:text-lg font-bold tracking-tight text-white hidden sm:block">NQT Smart Practice</h1>
+            <div className="flex items-center gap-2 lg:gap-4 group cursor-pointer transition-transform duration-300 hover:scale-105" onClick={() => setView('HOME')}>
+              <img src="/logo.png" alt="TCS NQT Logo" className="w-8 h-8 lg:w-10 lg:h-10 rounded-lg shadow-lg shadow-indigo-500/20 object-contain bg-slate-900/50 p-1 border border-slate-700/50" />
+              <h1 className="text-xs lg:text-lg font-bold tracking-tight text-white hidden sm:block">TCS NQT Smart Practice Platform</h1>
             </div>
           </div>
 
