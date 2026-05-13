@@ -129,6 +129,8 @@ export default function App() {
       let optionsArray: string[] = [];
       if (Array.isArray(q.options)) {
         optionsArray = q.options;
+      } else if (typeof q.options === 'string') {
+        optionsArray = q.options.split(/,|\n/).map((opt: string) => opt.trim());
       } else if (typeof q.options === 'object' && q.options !== null) {
         optionsArray = Object.values(q.options);
       }
@@ -633,7 +635,7 @@ export default function App() {
                   </div>
                 )}
 
-                {!isCoding && (
+                {!isCoding && Array.isArray(aptitudeQ.options) && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 lg:gap-4">
                     {aptitudeQ.options.map((optionValue, index) => (
                       <button
