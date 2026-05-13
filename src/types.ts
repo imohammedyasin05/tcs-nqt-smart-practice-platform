@@ -11,7 +11,7 @@ export interface Question {
   subject: Subject;
   topic: string;
   difficulty: Difficulty;
-  questionText: string;
+  question: string;
 }
 
 export interface AptitudeQuestion extends Question {

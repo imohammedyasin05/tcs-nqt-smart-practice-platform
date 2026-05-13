@@ -12,7 +12,7 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 const APTITUDE_SCHEMA = {
   type: Type.OBJECT,
   properties: {
-    questionText: { type: Type.STRING },
+    question: { type: Type.STRING },
     options: {
       type: Type.ARRAY,
       items: { type: Type.STRING },
@@ -20,20 +20,20 @@ const APTITUDE_SCHEMA = {
     answer: { type: Type.INTEGER },
     explanation: { type: Type.STRING },
   },
-  required: ["questionText", "options", "answer", "explanation"],
+  required: ["question", "options", "answer", "explanation"],
 };
 
 const CODING_SCHEMA = {
   type: Type.OBJECT,
   properties: {
-    questionText: { type: Type.STRING, description: "Title of the coding problem" },
+    question: { type: Type.STRING, description: "Title of the coding problem" },
     problemStatement: { type: Type.STRING },
     sampleInput: { type: Type.STRING },
     sampleOutput: { type: Type.STRING },
     constraints: { type: Type.STRING },
     explanation: { type: Type.STRING },
   },
-  required: ["questionText", "problemStatement", "sampleInput", "sampleOutput", "constraints", "explanation"],
+  required: ["question", "problemStatement", "sampleInput", "sampleOutput", "constraints", "explanation"],
 };
 
 const APTITUDE_BATCH_SCHEMA = {

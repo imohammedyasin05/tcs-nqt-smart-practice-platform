@@ -539,9 +539,10 @@ export default function App() {
               </div>
 
               <div className="space-y-8 lg:space-y-10">
-                <div className="text-lg lg:text-xl leading-relaxed text-slate-100 font-medium">
-                  {q.questionText}
-                </div>
+                {console.log("Full question object:", q)}
+                <h2 className="question text-lg lg:text-xl leading-relaxed text-slate-100 font-medium">
+                  {q.question || "Question not loaded"}
+                </h2>
 
                 {isCoding && (
                   <div className="space-y-6 lg:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
